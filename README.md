@@ -5,16 +5,41 @@
 Projet d'examen Master 2 Informatique CYBER - Microsoft Technologies.  
 Ce projet contient 3 exercices distincts implémentés dans une solution .NET unique.
 
+### 📊 Statut des exercices
+
+| Exercice | Description | Tests | Statut |
+|----------|-------------|-------|--------|
+| 1 | API E-Commerce | 18/18 ✅ | Complet |
+| 2 | Résolution de Labyrinthe (BFS) | 23/23 ✅ | Complet |
+| 3 | Intégration EF Core InMemory | - | Complet |
+| **TOTAL** | | **41/41 ✅** | **100%** |
+
 ---
 
 ## 🏗️ Structure de la solution
 
 ```
 ExamM2.sln                          # Solution principale
-├── ExamM2.Api/                     # API e-commerce (Exercice 1)
-├── ExamM2.Api.Tests/               # Tests de l'API
+├── ExamM2.Api/                     # API e-commerce (Exercices 1 & 3)
+│   ├── Controllers/
+│   │   ├── ProductsController.cs      # Exercice 1
+│   │   ├── OrdersController.cs        # Exercice 1
+│   │   ├── ProductsDbController.cs    # Exercice 3
+│   │   └── OrdersDbController.cs      # Exercice 3
+│   ├── Services/
+│   │   ├── ProductStockService.cs     # Exercice 1
+│   │   ├── OrderService.cs            # Exercice 1
+│   │   ├── ProductStockDbService.cs   # Exercice 3
+│   │   ├── PromoCodeDbService.cs      # Exercice 3
+│   │   └── OrderDbService.cs          # Exercice 3
+│   ├── Models/
+│   │   └── Entities/                  # Exercice 3 (EF Core)
+│   ├── Data/
+│   │   └── ECommerceDbContext.cs      # Exercice 3
+│   └── DTOs/
+├── ExamM2.Api.Tests/               # Tests de l'API (18 tests)
 ├── ExamM2.Maze/                    # Résolution de labyrinthe (Exercice 2)
-├── ExamM2.Maze.Tests/              # Tests du labyrinthe
+├── ExamM2.Maze.Tests/              # Tests du labyrinthe (23 tests)
 └── .gitignore                      # Exclusion /bin et /obj
 ```
 
@@ -25,26 +50,6 @@ ExamM2.sln                          # Solution principale
 ### Description
 
 API RESTful pour la gestion de commandes e-commerce avec système de remises automatiques et codes promotionnels.
-
-### Architecture
-
-```
-ExamM2.Api/
-├── Controllers/
-│   ├── ProductsController.cs      # GET /products
-│   └── OrdersController.cs        # POST /orders
-├── Services/
-│   ├── ProductStockService.cs     # Gestion du stock (Singleton)
-│   └── OrderService.cs            # Logique métier des commandes
-├── Models/
-│   ├── Product.cs                 # Modèle produit
-│   └── Discount.cs                # Modèle remise
-└── DTOs/
-    ├── ProductDto.cs
-    ├── OrderRequestDto.cs
-    ├── OrderResponseDto.cs
-    └── ErrorResponseDto.cs
-```
 
 ### Endpoints
 
@@ -255,9 +260,118 @@ Chemin: (0,0) -> (1,0) -> (2,0) -> (2,1) -> (3,1) -> (4,1) -> (4,2) -> (4,3) -> 
 
 ---
 
-## 🗄️ Exercice 3 : Ajout de Base de Données
+## 🗄️ Exercice 3 : Ajout de Base de Données (EF Core InMemory)
 
-> 🚧 À implémenter
+### 📋 Objectif
+
+Intégrer **Entity Framework Core InMemory** à l'API e-commerce de l'exercice 1 en ajoutant :
+- Une base de données avec **Produits** et **Codes Promo**
+- Des **nouveaux endpoints** séparés pour préserver l'exercice 1 (noté)
+- Une architecture non-invasive
+
+### 🏗️ Architecture
+
+**Approche choisie : Option 1 - Nouveaux endpoints séparés**
+
+```
+EXERCICE 1 (préservé) :
+- /api/products → ProductStockService (singleton)
+- /api/orders   → OrderService
+
+EXERCICE 3 (nouveaux) :
+- /api/productsdb → ProductStockDbService (EF Core)
+- /api/ordersdb   → OrderDbService (EF Core)
+```
+
+### 📦 Composants ajoutés
+
+#### 1. Entities (EF Core)
+- `ProductEntity.cs` : Id, Name, Price, Stock
+- `PromoCodeEntity.cs` : Id, Code, DiscountPercentage, IsActive
+
+#### 2. DbContext
+- `ECommerceDbContext.cs` avec seed data :
+  - **3 produits** : Product A (100€), Product B (200€), Product C (50€)
+  - **3 codes promo** : DISCOUNT10 (10%), DISCOUNT20 (20%), EXPIRED (inactif)
+
+#### 3. Services
+- `ProductStockDbService.cs` : Gestion stock via DB
+- `PromoCodeDbService.cs` : Validation codes promo DB
+- `OrderDbService.cs` : Traitement commandes avec DB
+
+#### 4. Controllers
+- `ProductsDbController.cs` : GET /api/productsdb
+- `OrdersDbController.cs` : POST /api/ordersdb
+
+### 🧪 Endpoints
+
+#### GET /api/productsdb
+Récupère tous les produits depuis la DB.
+
+```bash
+curl http://localhost:5149/api/productsdb
+```
+
+**Réponse** :
+```json
+[
+  { "id": 1, "name": "Product A", "price": 100.00, "stock": 50 },
+  { "id": 2, "name": "Product B", "price": 200.00, "stock": 30 },
+  { "id": 3, "name": "Product C", "price": 50.00, "stock": 100 }
+]
+```
+
+#### POST /api/ordersdb
+Crée une commande avec codes promo DB.
+
+```bash
+curl -X POST http://localhost:5149/api/ordersdb \
+  -H "Content-Type: application/json" \
+  -d '{
+    "products": [
+      { "productId": 1, "quantity": 2 },
+      { "productId": 2, "quantity": 1 }
+    ],
+    "promoCode": "DISCOUNT10"
+  }'
+```
+
+**Réponse** :
+```json
+{
+  "orderId": "...",
+  "products": [...],
+  "subtotal": 400.00,
+  "discounts": [
+    { "type": "PromoCode", "value": 40.00 }
+  ],
+  "total": 360.00,
+  "orderDate": "2024-01-15T10:30:00Z"
+}
+```
+
+### 🎯 Règles métier (identiques à Exercice 1)
+
+✅ **Remise automatique quantité** : -10% si qty > 5 sur un produit  
+✅ **Remise automatique montant** : -5% si sous-total > 100€  
+✅ **Codes promo DB** : DISCOUNT10 (10%), DISCOUNT20 (20%)  
+✅ **Validation stock** : Impossible si stock insuffisant  
+✅ **Codes promo inactifs** : EXPIRED refusé
+
+### ✅ Statut : COMPLET
+
+- [x] Entities créées
+- [x] DbContext avec seed data
+- [x] Services DB implémentés
+- [x] Controllers séparés
+- [x] Tests préservés (41/41 ✅)
+- [x] API fonctionnelle
+
+### 📝 Notes importantes
+
+⚠️ **Exercice 1 préservé** : Les endpoints `/api/products` et `/api/orders` originaux sont intacts pour l'évaluation.
+
+🔍 **Version EF Core** : 9.0.0 (compatible .NET 9.0)
 
 ---
 
@@ -265,6 +379,7 @@ Chemin: (0,0) -> (1,0) -> (2,0) -> (2,1) -> (3,1) -> (4,1) -> (4,2) -> (4,3) -> 
 
 - .NET 9.0
 - ASP.NET Core Web API
+- **Entity Framework Core InMemory 9.0.0**
 - xUnit (Tests unitaires)
 - C# avec Nullable enabled
 
