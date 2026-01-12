@@ -27,9 +27,8 @@ builder.Services.AddHealthChecks();
 
 builder.Services.AddControllers();
 
-// ==================== Swagger Configuration ====================
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// ==================== OpenAPI Configuration ====================
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
@@ -40,16 +39,10 @@ using (var scope = app.Services.CreateScope())
     context.Database.EnsureCreated(); // Crée la DB et applique le seed
 }
 
-// ==================== Swagger UI ====================
+// ==================== OpenAPI Documentation ====================
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "ExamM2 API v1");
-        options.RoutePrefix = string.Empty; // Swagger à la racine (http://localhost:5149/)
-        options.DocumentTitle = "ExamM2 - API E-Commerce";
-    });
+    app.MapOpenApi(); // Disponible sur /openapi/v1.json
 }
 
 // ==================== Health Checks ====================
