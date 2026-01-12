@@ -21,7 +21,6 @@ public class OrderService : IOrderService
     {
         var errors = new List<string>();
         
-        // Validation des produits et stocks
         var validatedProducts = ValidateProducts(orderRequest.Products, errors);
         
         if (errors.Any())
@@ -29,11 +28,9 @@ public class OrderService : IOrderService
             return (null, errors);
         }
 
-        // Calcul du total et des remises
         var productDetails = CalculateProductDetails(validatedProducts);
         var subtotal = productDetails.Sum(p => p.Total);
         
-        // Validation du code promo
         decimal? promoDiscount = ValidatePromoCode(orderRequest.PromoCode, subtotal, errors);
         
         if (errors.Any())
@@ -41,11 +38,9 @@ public class OrderService : IOrderService
             return (null, errors);
         }
 
-        // Calcul des remises
         var discounts = CalculateDiscounts(subtotal, promoDiscount);
         var total = CalculateFinalTotal(subtotal, discounts);
 
-        // Mise à jour des stocks
         UpdateStocks(validatedProducts);
 
         var response = new OrderResponseDto
@@ -92,7 +87,6 @@ public class OrderService : IOrderService
         {
             var subtotal = product.Price * quantity;
             
-            // Règle 1: Remise automatique de 10% si quantité > 5
             if (quantity > 5)
             {
                 subtotal = subtotal * 0.9m;
@@ -118,14 +112,12 @@ public class OrderService : IOrderService
             return null;
         }
 
-        // Règle 1: Le code promo doit exister
         if (!_promoCodes.ContainsKey(promoCode))
         {
             errors.Add("le code promo est invalide");
             return null;
         }
 
-        // Règle 2: Les codes promos sont valides seulement si la commande dépasse 50 euros
         if (subtotal < 50)
         {
             errors.Add("les codes promos ne sont valables qu'a partir de 50e d'achat");
@@ -139,7 +131,6 @@ public class OrderService : IOrderService
     {
         var discounts = new List<DiscountDto>();
 
-        // Règle 2: Remise automatique de 5% si total > 100 euros
         if (subtotal > 100)
         {
             discounts.Add(new DiscountDto
@@ -149,7 +140,6 @@ public class OrderService : IOrderService
             });
         }
 
-        // Ajout du code promo
         if (promoDiscount.HasValue)
         {
             discounts.Add(new DiscountDto
@@ -164,7 +154,6 @@ public class OrderService : IOrderService
 
     private decimal CalculateFinalTotal(decimal subtotal, List<DiscountDto> discounts)
     {
-        // Règle 3: Les remises se cumulent de façon additive
         var totalDiscountPercent = discounts.Sum(d => d.Value);
         var total = subtotal * (100 - totalDiscountPercent) / 100;
         return total;

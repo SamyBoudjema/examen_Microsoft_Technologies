@@ -2,13 +2,15 @@ using ExamM2.Api.Models;
 
 namespace ExamM2.Api.Services;
 
+/// <summary>
+/// Service singleton pour la gestion du stock en mémoire
+/// </summary>
 public class ProductStockService : IProductStockService
 {
     private readonly List<Product> _products;
 
     public ProductStockService()
     {
-        // Initialisation avec 5 produits par défaut
         _products = new List<Product>
         {
             new Product { Id = 1, Name = "Laptop", Price = 999.99m, Stock = 10 },
