@@ -19,14 +19,14 @@ public class ECommerceDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Seed des produits (identiques à l'exercice 1)
+        // Seed des produits IT
         modelBuilder.Entity<ProductEntity>().HasData(
-            new ProductEntity { Id = 1, Name = "Product A", Price = 100m, Stock = 10 },
-            new ProductEntity { Id = 2, Name = "Product B", Price = 200m, Stock = 5 },
-            new ProductEntity { Id = 3, Name = "Product C", Price = 50m, Stock = 20 }
+            new ProductEntity { Id = 1, Name = "RAM Corsair Vengeance 32GB DDR5", Price = 1000m, Stock = 25 },
+            new ProductEntity { Id = 2, Name = "SSD Samsung 980 PRO 2TB NVMe", Price = 250m, Stock = 15 },
+            new ProductEntity { Id = 3, Name = "iPhone 15 Pro 256GB", Price = 1200m, Stock = 8 }
         );
 
-        // Seed des codes promo (identiques à l'exercice 1)
+        // Seed des codes promo
         modelBuilder.Entity<PromoCodeEntity>().HasData(
             new PromoCodeEntity { Id = 1, Code = "DISCOUNT10", DiscountPercentage = 10m, IsActive = true },
             new PromoCodeEntity { Id = 2, Code = "DISCOUNT20", DiscountPercentage = 20m, IsActive = true },

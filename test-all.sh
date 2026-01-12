@@ -23,10 +23,10 @@ curl -s http://localhost:5149/api/productsdb | jq '.'
 echo ""
 
 # Test POST /api/ordersdb
-echo "🛒 POST /api/ordersdb"
+echo "🛒 POST /api/ordersdb (commande 2x RAM + 1x iPhone)"
 curl -s -X POST http://localhost:5149/api/ordersdb \
   -H "Content-Type: application/json" \
-  -d '{"products":[{"id":1,"quantity":2}],"promoCode":"DISCOUNT10"}' | jq '.'
+  -d '{"products":[{"id":1,"quantity":2},{"id":3,"quantity":1}],"promoCode":"DISCOUNT10"}' | jq '.'
 echo ""
 
 echo "✅ Tests terminés"

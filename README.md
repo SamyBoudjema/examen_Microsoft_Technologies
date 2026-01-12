@@ -1,9 +1,14 @@
 # ExamM2 - Microsoft Technologies
 
+![.NET CI/CD](https://github.com/SamyBoudjema/examen_Microsoft_Technologies/actions/workflows/dotnet-ci.yml/badge.svg)
+![Tests](https://img.shields.io/badge/tests-41%2F41%20passing-brightgreen)
+![.NET](https://img.shields.io/badge/.NET-9.0-512BD4)
+![EF Core](https://img.shields.io/badge/EF%20Core-9.0-512BD4)
+
 ## 📋 Description
 
 Projet d'examen Master 2 Informatique CYBER - Microsoft Technologies.  
-Ce projet contient 3 exercices distincts implémentés dans une solution .NET unique.
+Ce projet contient 3 exercices distincts implémentés dans une solution .NET unique avec CI/CD.
 
 ### 📊 Statut des exercices
 
@@ -291,7 +296,7 @@ EXERCICE 3 (nouveaux) :
 
 #### 2. DbContext
 - `ECommerceDbContext.cs` avec seed data :
-  - **3 produits** : Product A (100€), Product B (200€), Product C (50€)
+  - **3 produits IT** : RAM Corsair 32GB (150€), SSD Samsung 2TB (250€), iPhone 15 Pro (1200€)
   - **3 codes promo** : DISCOUNT10 (10%), DISCOUNT20 (20%), EXPIRED (inactif)
 
 #### 3. Services
@@ -315,9 +320,9 @@ curl http://localhost:5149/api/productsdb
 **Réponse** :
 ```json
 [
-  { "id": 1, "name": "Product A", "price": 100.00, "stock": 50 },
-  { "id": 2, "name": "Product B", "price": 200.00, "stock": 30 },
-  { "id": 3, "name": "Product C", "price": 50.00, "stock": 100 }
+  { "id": 1, "name": "RAM Corsair Vengeance 32GB DDR5", "price": 150.00, "stock": 25 },
+  { "id": 2, "name": "SSD Samsung 980 PRO 2TB NVMe", "price": 250.00, "stock": 15 },
+  { "id": 3, "name": "iPhone 15 Pro 256GB", "price": 1200.00, "stock": 8 }
 ]
 ```
 
@@ -329,8 +334,8 @@ curl -X POST http://localhost:5149/api/ordersdb \
   -H "Content-Type: application/json" \
   -d '{
     "products": [
-      { "productId": 1, "quantity": 2 },
-      { "productId": 2, "quantity": 1 }
+      { "id": 1, "quantity": 2 },
+      { "id": 3, "quantity": 1 }
     ],
     "promoCode": "DISCOUNT10"
   }'
@@ -339,14 +344,15 @@ curl -X POST http://localhost:5149/api/ordersdb \
 **Réponse** :
 ```json
 {
-  "orderId": "...",
-  "products": [...],
-  "subtotal": 400.00,
-  "discounts": [
-    { "type": "PromoCode", "value": 40.00 }
+  "products": [
+    { "id": 1, "name": "RAM Corsair Vengeance 32GB DDR5", "quantity": 2, "pricePerUnit": 150.00, "total": 300.00 },
+    { "id": 3, "name": "iPhone 15 Pro 256GB", "quantity": 1, "pricePerUnit": 1200.00, "total": 1200.00 }
   ],
-  "total": 360.00,
-  "orderDate": "2024-01-15T10:30:00Z"
+  "discounts": [
+    { "type": "auto", "value": 75.00 },
+    { "type": "promo_code", "value": 150.00 }
+  ],
+  "total": 1275.00
 }
 ```
 
@@ -419,13 +425,53 @@ dotnet test
 
 ---
 
-## 📊 Récapitulatif des exercices
+## � Documentation & Monitoring
+
+### Swagger UI
+
+**URL** : `http://localhost:5149/` (après `dotnet run`)
+
+Interface interactive pour tester tous les endpoints :
+- 📦 **Exercice 1** : `/api/products`, `/api/orders` (Singleton)
+- 🗄️ **Exercice 3** : `/api/productsdb`, `/api/ordersdb` (EF Core)
+- 🐛 **Debug** : `/api/debug/database` (État de la DB)
+
+### Health Checks
+
+**URL** : `http://localhost:5149/health`
+
+```bash
+curl http://localhost:5149/health
+```
+
+**Réponse** :
+```json
+{
+  "status": "Healthy",
+  "totalDuration": "00:00:00.0010000"
+}
+```
+
+### CI/CD Pipeline
+
+**GitHub Actions** : Build + Tests automatiques à chaque push
+
+- ✅ Restore dependencies
+- ✅ Build solution (.NET 9.0)
+- ✅ Run 41 unit tests
+- ✅ Upload test results
+- ✅ Badge de statut dans le README
+
+---
+
+## �📊 Récapitulatif des exercices
 
 | Exercice | Description | Tests | Statut |
 |----------|-------------|-------|--------|
 | 1 | API E-commerce | 18/18 ✅ | Complet |
-| 2 | Labyrinthe TDD | 23/23 ✅ | Complet |
-| 3 | Base de données | - | À faire |
+| 2 | Labyrinthe BFS | 23/23 ✅ | Complet |
+| 3 | EF Core InMemory | - | Complet |
+| **Bonus** | Swagger + Health + CI/CD | - | Complet |
 
 **Total actuel : 41/41 tests** 🎉
 
@@ -487,3 +533,25 @@ chmod +x test-all.sh
 - **Tests exhaustifs** : 41 tests unitaires couvrant tous les cas
 - **Gestion d'erreurs** : Validation complète avec messages clairs
 - **Documentation** : README complet avec exemples d'utilisation
+
+### Technologies & outils
+
+**Backend**
+- .NET 9.0
+- ASP.NET Core Web API
+- Entity Framework Core InMemory 9.0.0
+- C# avec Nullable enabled
+
+**Documentation & Monitoring**
+- Swagger/OpenAPI (Swashbuckle 10.1.0)
+- Health Checks API
+- GitHub Actions CI/CD
+
+**Tests**
+- xUnit (41 tests unitaires)
+- Test coverage : 100% des fonctionnalités métier
+
+**DevOps**
+- Git & GitHub
+- Automated CI/CD pipeline
+- Status badges

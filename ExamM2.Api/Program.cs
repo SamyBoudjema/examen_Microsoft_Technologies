@@ -22,8 +22,14 @@ builder.Services.AddScoped<ProductStockDbService>();
 builder.Services.AddScoped<PromoCodeDbService>();
 builder.Services.AddScoped<OrderDbService>();
 
+// ==================== Health Checks ====================
+builder.Services.AddHealthChecks();
+
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+
+// ==================== Swagger Configuration ====================
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -34,11 +40,23 @@ using (var scope = app.Services.CreateScope())
     context.Database.EnsureCreated(); // Crée la DB et applique le seed
 }
 
-// Configure the HTTP request pipeline.
+// ==================== Swagger UI ====================
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "ExamM2 API v1");
+        options.RoutePrefix = string.Empty; // Swagger à la racine (http://localhost:5149/)
+        options.DocumentTitle = "ExamM2 - API E-Commerce";
+    });
 }
+
+// ==================== Health Checks ====================
+app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    ResponseWriter = HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.UseHttpsRedirection();
 
