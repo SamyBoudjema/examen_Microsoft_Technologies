@@ -1,6 +1,148 @@
 @ExamM2.Api_HostAddress = http://localhost:5149
 
-GET {{ExamM2.Api_HostAddress}}/weatherforecast/
+### GET Products
+GET {{ExamM2.Api_HostAddress}}/products
 Accept: application/json
 
 ###
+
+### POST Order - Simple
+POST {{ExamM2.Api_HostAddress}}/orders
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": 1,
+      "quantity": 2
+    }
+  ]
+}
+
+###
+
+### POST Order - With quantity > 5 (10% discount on product)
+POST {{ExamM2.Api_HostAddress}}/orders
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": 5,
+      "quantity": 6
+    }
+  ]
+}
+
+###
+
+### POST Order - With valid promo code
+POST {{ExamM2.Api_HostAddress}}/orders
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": 3,
+      "quantity": 1
+    }
+  ],
+  "promo_code": "DISCOUNT20"
+}
+
+###
+
+### POST Order - With cumulative discounts
+POST {{ExamM2.Api_HostAddress}}/orders
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": 1,
+      "quantity": 1
+    }
+  ],
+  "promo_code": "DISCOUNT10"
+}
+
+###
+
+### POST Order - With non-existent product (ERROR)
+POST {{ExamM2.Api_HostAddress}}/orders
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": 999,
+      "quantity": 1
+    }
+  ]
+}
+
+###
+
+### POST Order - With insufficient stock (ERROR)
+POST {{ExamM2.Api_HostAddress}}/orders
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": 1,
+      "quantity": 100
+    }
+  ]
+}
+
+###
+
+### POST Order - With invalid promo code (ERROR)
+POST {{ExamM2.Api_HostAddress}}/orders
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": 3,
+      "quantity": 1
+    }
+  ],
+  "promo_code": "INVALID"
+}
+
+###
+
+### POST Order - With promo code below 50€ (ERROR)
+POST {{ExamM2.Api_HostAddress}}/orders
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": 5,
+      "quantity": 1
+    }
+  ],
+  "promo_code": "DISCOUNT20"
+}
+
+###
+
+### POST Order - With multiple errors
+POST {{ExamM2.Api_HostAddress}}/orders
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": 999,
+      "quantity": 1
+    },
+    {
+      "id": 1,
+      "quantity": 100
+    }
+  ]
+}
