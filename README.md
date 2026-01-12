@@ -437,6 +437,46 @@ Samy Boudjema - Master 2 Informatique CYBER
 
 ---
 
+---
+
+## 🧪 Tests
+
+### Tests unitaires (Exercices 1 & 2)
+
+```bash
+# Tous les tests
+dotnet test
+
+# Résultat attendu : 41/41 tests ✅
+```
+
+### Tests API manuels (Exercice 3)
+
+**1. Démarrer l'API :**
+```bash
+cd ExamM2.Api
+dotnet run
+```
+
+**2. Tester les endpoints :**
+```bash
+# Liste des produits (EF Core)
+curl http://localhost:5149/api/productsdb
+
+# Créer une commande
+curl -X POST http://localhost:5149/api/ordersdb \
+  -H "Content-Type: application/json" \
+  -d '{"products":[{"id":1,"quantity":2}],"promoCode":"DISCOUNT10"}'
+```
+
+**3. Script de test complet :**
+```bash
+chmod +x test-all.sh
+./test-all.sh
+```
+
+---
+
 ## 📝 Notes de développement
 
 ### Bonnes pratiques respectées
