@@ -46,9 +46,9 @@ public class MazeFillTests
 ...
 ..S");
 
-        maze.Fill(); // Traite le Start (0,0)
+        maze.Fill();
 
-        Assert.Equal(0, maze.Distances[0][0]); // Start a distance 0
+        Assert.Equal(0, maze.Distances[0][0]);
     }
 
     [Fact]
@@ -58,9 +58,8 @@ public class MazeFillTests
 ...
 ..S");
 
-        maze.Fill(); // Traite le Start (0,0)
+        maze.Fill();
 
-        // Après avoir traité Start, ses voisins (0,1) et (1,0) sont dans la queue
         Assert.True(maze.ToVisit.Count >= 2);
     }
 }
